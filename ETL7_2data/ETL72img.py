@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 #ETL7toimg.py ETL7の4個の分割ファイルを読み，ひらがな画像集を作成
 # 使用するライブラリを読み込む
 import struct
@@ -43,10 +40,3 @@ for fname in files:
        iE = enhancer.enhance(16)
        iE.save(fullpath, 'PNG')
 print("ok")
-
-
-# In[ ]:
-
-
-
-
