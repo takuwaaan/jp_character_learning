@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[42]:
-
-
 #ETL7img2data.py 
 #画像を読み込み，ひらがな画像データセットを作成
 # 使用するライブラリを読み込む
@@ -49,33 +46,4 @@ for i, code in enumerate(hiraganadir):
            plt.title(str(i))
            plt.imshow(img, cmap='gray')
 
-
-# In[43]:
-
-
-ary.shape
-
-
-# In[44]:
-
-
-img
-
-
-# In[45]:
-
-
-ary[0]
-
-
-# In[46]:
-
-
 np.savez_compressed("ETL7.npz", ary)
-
-
-# In[ ]:
-
-
-
-
