@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[61]:
-
-
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 # TensorFlow と tf.keras のインポート
@@ -14,37 +11,7 @@ from tensorflow import keras
 import numpy as np
 import matplotlib.pyplot as plt
 
-print(tf.__version__)
-
-
-# In[62]:
-
-
-ary = np.load("ETL7.npz")['arr_0'].reshape([-1, 32, 32]).astype(np.float32) / 15
-
-
-# In[63]:
-
-
-ary.shape
-
-
-# In[75]:
-
-
-#データ内容（手書き文字）の確認
-plt.figure()
-plt.imshow(ary[3900])
-plt.colorbar()
-plt.grid(False)
-plt.show()
-
-
-# In[65]:
-
-
-#認識工程
-
+#認識用
 import scipy.misc
 from keras import backend as K
 from keras import initializers
@@ -56,16 +23,25 @@ from keras.utils import np_utils
 from sklearn.model_selection import train_test_split
 from PIL import Image
 
+#データ呼び出し
+ary = np.load("ETL7.npz")['arr_0'].reshape([-1, 32, 32]).astype(np.float32) / 15
 
-# In[66]:
+#データ内容の確認
+plt.figure()
+plt.imshow(ary[3900])
+plt.colorbar()
+plt.grid(False)
+plt.show()
 
-
+#認識工程
 #訓練データとテストデータへ変換
 
+#ひらがな46文字
 nb_classes = 46
-#350人のひらがなデータ
+#画像サイズ(32,32)
 img_rows, img_cols = 32, 32
 
+#350人のひらがなデータを訓練データとして用意
 #scipy.cisc.imresizeは古いので最新の方法に変更 https://walkingmask.hatenablog.com/entry/2019/08/09/205651
 X_train = np.zeros([nb_classes * 350, img_rows, img_cols], dtype=np.float32)
 for i in range(nb_classes * 350):
@@ -73,12 +49,8 @@ for i in range(nb_classes * 350):
     # X_train[i] = ary[i]  
 Y_train = np.repeat(np.arange(nb_classes), 350)
 
-#トレーニングデータとテストデータにスプリット
+#トレーニングデータとテストデータに分割
 X_train, X_test, Y_train, Y_test = train_test_split(X_train, Y_train, test_size=0.2)
-
-
-# In[67]:
-
 
 # 画像集合を表す4次元テンソルに変形
 # keras.jsonのimage_dim_orderingがthのときはチャネルが2次元目、tfのときはチャネルが4次元目にくる
@@ -91,38 +63,16 @@ else:
     X_test = X_test.reshape(X_test.shape[0], img_rows, img_cols, 1)
     input_shape = (img_rows, img_cols, 1)
 
-
-# In[68]:
-
-
-#ラベル情報を２進数へ変換（Kerasだと必要らしい）
+#ラベル情報を２進数へ変換（Kerasで必要）
 Y_train = np_utils.to_categorical(Y_train, nb_classes)
 Y_test = np_utils.to_categorical(Y_test, nb_classes)
-
-
-# In[69]:
-
-
-Y_test.shape
-
-
-# In[70]:
-
 
 #訓練データへのノイズ関数適用（１５度回転、1.2or0.8ズーム）
 datagen = ImageDataGenerator(rotation_range=15, zoom_range=0.20)
 datagen.fit(X_train)
 
+#CNN
 model = Sequential()
-
-
-# In[71]:
-
-
-#def my_init():
-#    return initializers.normal(mean=0.0, stddev=0.05, seed=None)
-#    return initializers.VarianceScaling(scale=0.1, mode='fan_out', distribution='normal',  seed=None)
-#   return initializers.normal(shape, scale=0.1, name=name)
 
 def m6_1():
     model.add(Convolution2D(32,  (3, 3),input_shape=input_shape))
@@ -148,7 +98,6 @@ def m6_1():
     model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
 
-
 def classic_neural():
     model.add(Flatten(input_shape=input_shape))
     model.add(Dense(256))
@@ -158,34 +107,20 @@ def classic_neural():
     model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
 
-
-
-# In[72]:
-
-
+#認識実行(epoch:10)
 m6_1()
 # classic_neural()
-
 model.summary()
 model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['accuracy'])
 model.fit_generator(datagen.flow(X_train, Y_train, batch_size=16), samples_per_epoch=X_train.shape[0],
                     nb_epoch=10, validation_data=(X_test, Y_test))
 
-
-# In[73]:
-
-
+#正解率の表示
 score = model.evaluate(X_test, Y_test, verbose=1)
 print("正解率(acc)：", score[1])
 
-
-# In[74]:
-
-
+#予測モデルの保存
 model.save("Hiragana_97_e10.h5")
-
-
-# In[ ]:
 
 
 
