@@ -1,24 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[38]:
-
-
-#!/usr/bin/env python3
-# coding: utf-8
-
-# -*- coding: utf-8 -*-
 import cv2
 import numpy as np
 from keras import backend as K
 from keras.models import load_model
 import matplotlib.pyplot as plt
 
-
-# In[30]:
-
-
-
+#OpenCVでの描画
 
 #sx, syは線の始まりの位置
 sx, sy = 0, 0
@@ -61,14 +50,11 @@ def callback(event, x, y, flags, param):
     #CV_EVENT_FLAG_SHIFTKEY (16):Shiftボタンが押されているか
     #CV_EVENT_FLAG_ALTKEY (32):Altボタンが押されているか
     
-
-    
     #マウスの左ボタンがクリックされたとき
     if event == cv2.EVENT_LBUTTONDOWN:
         sx, sy = x, y
         data[n,plot_size] = (x*100/512,y*100/512)
-        plot_size +=1
-        
+        plot_size +=1       
 
     #マウスの左ボタンがクリックされていて、マウスが動いたとき
     if (flags & cv2.EVENT_FLAG_LBUTTON) and event == cv2.EVENT_MOUSEMOVE:
@@ -116,11 +102,8 @@ while(1):
         plot_size=0
         n=0
         print ("clear")
-
-
-# In[39]:
-
-
+        
+#予測用へ保存したデータを変換
 
 Xt = []
 img = cv2.imread(path_w+".jpg", 0)
@@ -135,16 +118,10 @@ plt.colorbar()
 plt.grid(False)
 plt.show()
 
-
-# In[40]:
-
-
 Xt.append(img)
 Xt = np.array(Xt)/255
 
-
-# In[41]:
-
+#学習時のデータ形式と合わせる
 
 img_rows, img_cols = 32, 32
 # 画像集合を表す4次元テンソルに変形
@@ -156,19 +133,10 @@ else:
     Xt = Xt.reshape(Xt.shape[0], img_rows, img_cols, 1)
     input_shape = (img_rows, img_cols, 1)
 
-
-# In[43]:
-
-
+#予測モデルの呼び込み
 model = load_model("Hiragana_97_e10.h5")
 
+#予測結果出力
 result = model.predict_classes(Xt)
 model.predict_classes
 print(result[0])
-
-
-# In[ ]:
-
-
-
-
