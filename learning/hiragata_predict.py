@@ -119,7 +119,7 @@ plt.grid(False)
 plt.show()
 
 Xt.append(img)
-Xt = np.array(Xt)/255
+Xt = np.array(Xt)
 
 #学習時のデータ形式と合わせる
 
