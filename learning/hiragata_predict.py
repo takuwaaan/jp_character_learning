@@ -134,7 +134,7 @@ else:
     input_shape = (img_rows, img_cols, 1)
 
 #予測モデルの呼び込み
-model = load_model("Hiragana_97_e10.h5")
+model = load_model("Hiragana_99_e40.h5")
 
 #予測結果出力
 result = model.predict_classes(Xt)
